@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="https://arxiv.org/abs/2601.21233"><img src="https://img.shields.io/badge/arXiv-2601.21233-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://icml.cc/Conferences/2026"><img src="https://img.shields.io/badge/ICML-2026-1f6feb.svg" alt="ICML 2026"></a>
   <a href="https://x-zheng16.github.io/System-Prompt-Open/"><img src="https://img.shields.io/badge/Gallery-System_Prompt_Open-22D3BB.svg" alt="Gallery"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License"></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python"></a>
@@ -55,6 +56,7 @@
 
 | Date       | Update                                                                                                          |
 |:-----------|:----------------------------------------------------------------------------------------------------------------|
+| 2026-05    | Paper accepted to **ICML 2026**                                                                                 |
 | 2026-03    | Code and data open-sourced on [GitHub](https://github.com/x-zheng16/JustAsk)                                    |
 | 2026-03    | [System Prompt Open Gallery](https://x-zheng16.github.io/System-Prompt-Open/) launched with 45+ extracted system prompts |
 | 2026-01    | Paper posted on [arXiv](https://arxiv.org/abs/2601.21233)                                                       |
@@ -189,20 +191,20 @@ From the same team:
 **BibTeX:**
 
 ```bibtex
-@article{zheng2026justask,
+@inproceedings{zheng2026justask,
   title={Just Ask: Curious Code Agents Reveal System
          Prompts in Frontier LLMs},
   author={Zheng, Xiang and Wu, Yutao and Huang, Hanxun
           and Li, Yige and Ma, Xingjun and Li, Bo
           and Jiang, Yu-Gang and Wang, Cong},
-  journal={arXiv preprint arXiv:2601.21233},
+  booktitle={International Conference on Machine Learning (ICML)},
   year={2026}
 }
 ```
 
 **Plain text:**
 
-> Xiang Zheng, Yutao Wu, Hanxun Huang, Yige Li, Xingjun Ma, Bo Li, Yu-Gang Jiang, and Cong Wang. "Just Ask: Curious Code Agents Reveal System Prompts in Frontier LLMs." arXiv preprint arXiv:2601.21233, 2026.
+> Xiang Zheng, Yutao Wu, Hanxun Huang, Yige Li, Xingjun Ma, Bo Li, Yu-Gang Jiang, and Cong Wang. "Just Ask: Curious Code Agents Reveal System Prompts in Frontier LLMs." In *International Conference on Machine Learning (ICML)*, 2026.
 
 ## Star History
 

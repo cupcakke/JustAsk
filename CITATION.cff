@@ -20,7 +20,7 @@ authors:
   - family-names: Wang
     given-names: Cong
 preferred-citation:
-  type: article
+  type: conference-paper
   title: "Just Ask: Curious Code Agents Reveal System Prompts in Frontier LLMs"
   authors:
     - family-names: Zheng
@@ -39,6 +39,6 @@ preferred-citation:
       given-names: Yu-Gang
     - family-names: Wang
       given-names: Cong
-  journal: "arXiv preprint arXiv:2601.21233"
+  collection-title: "International Conference on Machine Learning (ICML)"
   year: 2026
   url: "https://arxiv.org/abs/2601.21233"
