@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#050510" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f7f7fa" media="(prefers-color-scheme: light)">
+<title>JustAsk</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='22' fill='%23050510'/%3E%3Cpath d='M32 14c-10 0-18 6.7-18 15 0 4.6 2.5 8.7 6.4 11.4-.5 2.5-1.9 4.8-3.9 6.4 3.3-.3 6.4-1.4 9-3.2 2 .6 4.2.9 6.5.9 10 0 18-6.7 18-15S42 14 32 14z' fill='%23505aff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark-dimmed.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+</head>
+<body>
+<canvas id="glass-renderer-canvas" aria-hidden="true"></canvas>
+<div id="bg" aria-hidden="true"></div>
+<div id="app">
+  <div id="sidebar-backdrop" class="sb-backdrop" aria-hidden="true"></div>
+  <div id="sidebar" aria-hidden="true">
+    <div class="sb-hdr">
+      <span class="sb-title">JustAsk</span>
+      <button class="sb-close" id="btn-sb-close" aria-label="Bezár"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.4L17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg></button>
+    </div>
+    <div class="sb-body">
+      <div class="sb-pull-hint"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg></div>
+      <button class="sb-new lg" id="btn-sb-new" data-haptic="impact-light"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Új munkamenet</button>
+
+      <div class="sb-sec">Célmodell</div>
+      <div class="sb-si lg target-box">
+        <input id="sb-model" type="text" placeholder="pl. openai/gpt-4o-mini" list="modelList" autocomplete="off">
+        <datalist id="modelList"></datalist>
+      </div>
+      <div class="sb-setting-row">
+        <label>Költségkeret (attempt)</label>
+        <input id="sb-budget" type="number" min="1" max="200" value="40">
+      </div>
+      <div class="sb-setting-row">
+        <label>Mód</label>
+        <select id="sb-mode">
+          <option value="send" selected>Kézi üzenet</option>
+          <option value="step">Egy ügynök-lépés</option>
+          <option value="auto">Auto futtatás</option>
+          <option value="simple">Sima chat (gpt-5.6-sol)</option>
+        </select>
+      </div>
+      <div class="sb-setting-row">
+        <label>Nyelv</label>
+        <select id="sb-lang">
+          <option value="en">English</option>
+          <option value="hu" selected>Magyar</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+        </select>
+      </div>
+      <div class="sb-actions">
+        <button id="btn-stop" class="as-option danger-btn lg" disabled>Leállítás</button>
+        <button id="btn-finalize" class="as-option lg">Siker jelölése & mentés</button>
+        <button id="btn-archive" class="as-option lg">Archiválás és reset</button>
+      </div>
+
+      <div class="sb-sec">Munkamenetek</div>
+      <div id="hlist"></div>
+
+      <div class="sb-sec">Tudás</div>
+      <div class="tab-row sb-tabs">
+        <button class="sb-tab active" data-stab="ucb">UCB</button>
+        <button class="sb-tab" data-stab="rules">Szabályok</button>
+        <button class="sb-tab" data-stab="models">Modellek</button>
+      </div>
+      <div class="stab" data-stab="ucb"><ol id="ucbList" class="ranked"></ol></div>
+      <div class="stab hidden" data-stab="rules"><div id="rulesList" class="rules"></div></div>
+      <div class="stab hidden" data-stab="models">
+        <div class="counts" id="modelCounts"></div>
+        <div class="add-model-row">
+          <input id="quickAddInput" type="text" placeholder="model_id hozzáadása">
+          <button id="btnQuickAdd" class="cb-copy">+</button>
+        </div>
+        <div id="modelListEl" class="models"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="action-sheet" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="as-backdrop"></div>
+    <div class="as-container">
+      <div class="as-group lg" id="as-group">
+        <div class="as-title-block" id="as-title-block" style="display:none">
+          <div class="as-title" id="as-title"></div>
+          <div class="as-message" id="as-message" style="display:none"></div>
+        </div>
+        <div id="as-options"></div>
+      </div>
+      <button type="button" class="as-cancel lg" id="as-cancel" data-haptic="selection">Mégse</button>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id="scroll-area">
+      <div id="msg-list" role="list"></div>
+    </div>
+    <div id="ib-wrap">
+      <div class="ib-inner">
+        <div class="mode-bar" id="mode-bar">
+          <button class="mode-btn active" data-mode="send">Küldés</button>
+          <button class="mode-btn" data-mode="step">Egy lépés</button>
+          <button class="mode-btn" data-mode="auto">Auto</button>
+          <button class="mode-btn" data-mode="simple">Sima</button>
+        </div>
+        <div class="status-row lg" id="statusRow">
+          <span class="dot"></span>
+          <span id="statusText">tétlen</span>
+          <span class="sep">·</span>
+          <span id="modelPill">nincs modell</span>
+          <span class="sep">·</span>
+          <span id="attemptPill">attempt 0</span>
+          <span class="sep">·</span>
+          <span id="stackPill">stack 0</span>
+        </div>
+        <div class="ib-row">
+          <button class="ibtn lg" id="btn-menu" aria-label="Menü" type="button" data-haptic="impact-light"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+          <form class="ibox lg" onsubmit="event.preventDefault();"><textarea id="ta" placeholder="Üzenet…" rows="1" aria-label="Üzenet" enterkeyhint="send"></textarea></form>
+          <button class="sbtn" id="sbtn" disabled aria-label="Küldés" type="button" data-haptic="impact-medium"><svg id="sico" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+        </div>
+        <div class="extracted-row lg" id="extractedRow" style="display:none">
+          <div class="extracted-title">Kinyert system prompt</div>
+          <div class="extracted-text" id="extractedText"></div>
+          <div class="extracted-actions">
+            <button class="cb-copy" id="btnCopyPrompt">Másol</button>
+            <button class="cb-copy" id="btnDownloadPrompt">Letöltés .md</button>
+          </div>
+        </div>
+        <div class="judge-row lg" id="judgeRow" style="display:none">
+          <div class="judge-title">Utolsó judge</div>
+          <div class="judge-body" id="judgeBody"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button id="stb" class="lg" aria-label="Ugrás az aljára"><svg viewBox="0 0 24 24"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></button>
+  <div id="toasts" aria-live="polite"></div>
+  <div class="ctx-overlay" id="ctx-overlay"></div>
+  <div class="ctx-menu lg" id="ctx-menu" role="menu"></div>
+</div>
+<input type="file" id="fg" style="display:none" multiple>
+<script src="/static/app.js"></script>
+</body>
+</html>
