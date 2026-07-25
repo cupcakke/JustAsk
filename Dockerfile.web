@@ -1,0 +1,26 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    fastapi==0.115.4 \
+    "uvicorn[standard]==0.32.0" \
+    httpx==0.27.2 \
+    pydantic==2.9.2 \
+    python-dotenv==1.0.1 \
+    python-multipart==0.0.12 \
+    openai
+
+COPY web/ /app/web/
+COPY data/ /app/data/
+COPY logs/ /app/logs/
+COPY src/ /app/src/
+
+RUN mkdir -p /app/data /app/logs/evolving /app/archive
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+EXPOSE 8000
+
+ENTRYPOINT ["python", "-m", "web.run", "--host", "0.0.0.0", "--port", "8000"]
